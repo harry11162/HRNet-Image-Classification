@@ -259,3 +259,8 @@ def resnet152(pretrained=False, **kwargs):
     if pretrained:
         model.load_state_dict(model_zoo.load_url(model_urls['resnet152']))
     return model
+
+
+def get_cls_net(config, **kwargs):
+    model = resnet50(pretrained=False, num_experts=8)
+    return model
