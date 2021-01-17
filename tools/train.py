@@ -175,10 +175,10 @@ def main():
     )
 
     for epoch in range(last_epoch, config.TRAIN.END_EPOCH):
-        lr_scheduler.step()
         # train for one epoch
         train(config, train_loader, model, criterion, optimizer, epoch,
               final_output_dir, tb_log_dir, writer_dict)
+        lr_scheduler.step()
         # evaluate on validation set
         perf_indicator = validate(config, valid_loader, model, criterion,
                                   final_output_dir, tb_log_dir, writer_dict)
