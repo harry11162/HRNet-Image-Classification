@@ -78,6 +78,8 @@ class Bottleneck(nn.Module):
         self.bn3 = nn.BatchNorm2d(planes * self.expansion)
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
+        if downsample is not None:
+            self.downsample_bn = nn.BatchNorm2d(planes * self.expansion)
         self.stride = stride
 
         self.condconv = num_experts > 1
@@ -113,8 +115,10 @@ class Bottleneck(nn.Module):
         if self.downsample is not None:
             if self.condconv:
                 identity = self.downsample(x, routing_weight)
+                identity = self.downsample_bn(identity)
             else:
                 identity = self.downsample(x)
+                identity = self.downsample_bn(identity)
 
         out += identity
         out = self.relu(out)
@@ -162,14 +166,9 @@ class ResNet(nn.Module):
                     nn.init.constant_(m.bn2.weight, 0)
 
     def _make_layer(self, block, planes, blocks, stride=1, num_experts=1):
-        import pdb
-        pdb.set_trace()
         downsample = None
         if stride != 1 or self.inplanes != planes * block.expansion:
-            downsample = nn.Sequential(
-                conv1x1(self.inplanes, planes * block.expansion, stride, num_experts=num_experts),
-                nn.BatchNorm2d(planes * block.expansion),
-            )
+            downsample = conv1x1(self.inplanes, planes * block.expansion, stride, num_experts=num_experts)
 
         layers = []
         layers.append(block(self.inplanes, planes, stride, downsample, num_experts=num_experts))
