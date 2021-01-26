@@ -174,7 +174,7 @@ class ResNet(nn.Module):
         layers.append(block(self.inplanes, planes, stride, downsample, num_experts=num_experts))
         self.inplanes = planes * block.expansion
         for _ in range(1, blocks):
-            layers.append(block(self.inplanes, planes))
+            layers.append(block(self.inplanes, planes, num_experts=num_experts))
 
         return nn.Sequential(*layers)
 
